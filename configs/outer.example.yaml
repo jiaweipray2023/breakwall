@@ -1,0 +1,25 @@
+# bw-outer 配置文件 (外网 DMZ 代理)
+# 部署在外网 DMZ 区，连接实际的 SSH/VNC 服务器
+
+# 目标服务映射列表
+# name: 服务名称（需与 inner 配置中的名称一一对应）
+# target: DMZ 区中实际 SSH/VNC 服务器地址
+services:
+  - name: "ssh-server1"
+    target: "192.168.1.10:22"
+  - name: "vnc-server1"
+    target: "192.168.1.10:5900"
+
+# 正向通道 (内网 → 外网)，经过正向隔离装置
+# mode: "listen" 表示监听来自正向隔离装置的连接
+# address: 外网侧监听地址
+forward:
+  mode: "listen"
+  address: ":9001"
+
+# 反向通道 (外网 → 内网)，经过反向隔离装置
+# mode: "connect" 表示主动连接反向隔离装置的外网侧地址
+# address: 反向隔离装置的外网侧地址
+reverse:
+  mode: "connect"
+  address: "10.0.2.100:9002"

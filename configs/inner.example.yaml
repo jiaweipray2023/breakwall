@@ -1,0 +1,25 @@
+# bw-inner 配置文件 (内网代理)
+# 部署在内网侧，接受标准 SSH/VNC 客户端连接
+
+# 对内网暴露的服务列表
+# name: 服务名称（需与 outer 配置中的名称一一对应）
+# listen: 内网监听地址
+services:
+  - name: "ssh-server1"
+    listen: ":2222"
+  - name: "vnc-server1"
+    listen: ":5900"
+
+# 正向通道 (内网 → 外网)，经过正向隔离装置
+# mode: "connect" 表示主动连接，"listen" 表示被动监听
+# address: 正向隔离装置的内网侧地址或外网侧监听地址
+forward:
+  mode: "connect"
+  address: "10.0.1.100:9001"
+
+# 反向通道 (外网 → 内网)，经过反向隔离装置
+# mode: "listen" 表示监听来自反向隔离装置的连接
+# address: 内网侧监听地址
+reverse:
+  mode: "listen"
+  address: ":9002"
