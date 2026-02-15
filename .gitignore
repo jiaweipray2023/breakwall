@@ -1,4 +1,6 @@
-/bw-inner
-/bw-outer
+__pycache__/
+*.pyc
+*.pyo
+.venv/
 configs/inner.yaml
 configs/outer.yaml

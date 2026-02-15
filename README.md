@@ -1,4 +1,4 @@
-# Breakwall
+# Keller-Link
 
 通过正反向隔离装置，远程运维 DMZ 区设备的 SSH/VNC 代理系统。
 
@@ -25,15 +25,19 @@
 - **正向隔离**：仅允许内网→外网方向的数据
 - **反向隔离**：仅允许外网→内网方向的数据
 
-Breakwall 将双向的 SSH/VNC 会话拆分为两条单向数据流，分别通过正向和反向隔离装置传输，从而在满足安全隔离要求的前提下实现远程运维。
+Keller-Link 将双向的 SSH/VNC 会话拆分为两条单向数据流，分别通过正向和反向隔离装置传输，从而在满足安全隔离要求的前提下实现远程运维。
 
 多个 SSH/VNC 会话通过自定义的二进制帧协议在通道上复用，支持并发访问。
 
-## 构建
+## 环境要求
+
+- Python >= 3.11
+- pyyaml >= 6.0
+
+## 安装
 
 ```bash
-go build -o bw-inner ./cmd/bw-inner
-go build -o bw-outer ./cmd/bw-outer
+pip install -r requirements.txt
 ```
 
 ## 配置
@@ -85,10 +89,10 @@ reverse:                         # 反向通道 (外→内)
 
 ```bash
 # 在内网服务器上运行
-./bw-inner -config configs/inner.yaml
+python bw_inner.py -c configs/inner.yaml
 
 # 在外网 DMZ 服务器上运行
-./bw-outer -config configs/outer.yaml
+python bw_outer.py -c configs/outer.yaml
 ```
 
 内网用户使用标准客户端连接即可：
@@ -99,6 +103,31 @@ ssh user@inner-proxy-host -p 2222
 
 # VNC 连接
 vncviewer inner-proxy-host:5900
+```
+
+## 测试
+
+```bash
+python -m pytest tests/ -v
+```
+
+## 项目结构
+
+```
+keller-link/
+├── bw_inner.py              # 内网代理入口
+├── bw_outer.py              # 外网代理入口
+├── keller_link/
+│   ├── proto.py             # 二进制帧协议
+│   ├── session.py           # 会话管理器
+│   ├── transport.py         # 单向通道传输层
+│   └── config.py            # 配置加载
+├── configs/
+│   ├── inner.example.yaml   # 内网配置示例
+│   └── outer.example.yaml   # 外网配置示例
+├── tests/
+│   └── test_integration.py  # 集成测试
+└── requirements.txt
 ```
 
 ## 帧协议
